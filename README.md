@@ -2,7 +2,7 @@
 ![GitHub](https://img.shields.io/github/license/IgorVolochay/Face-recognition?style=flat-square&color=blue) &nbsp;
 ![GitHub Repo stars](https://img.shields.io/github/stars/IgorVolochay/Face-recognition?style=flat-square&color=yellowgreen) &nbsp;
 ![GitHub forks](https://img.shields.io/github/forks/IgorVolochay/Face-recognition?style=flat-square) &nbsp;
-![Python version](https://img.shields.io/badge/python-3.7-green?style=flat-square) <br>
+![Python version](https://img.shields.io/badge/python-3.8-green?style=flat-square) <br>
 
 ## **Описание**
 Система, написанная с применением алгоритмов **машинного обучения**, предназначенная для обнаружения лиц на изображении, с последующей идентификацией личности при помощи нейросети классификатора. <br>
@@ -16,7 +16,7 @@ ___
 * `Matplotlib`.
 ___
 ## **Обучающая и Тестовая выборка:**
-Обучающая выборка состоит из 5 наборов изображений лиц. 4 из 5 наборов состоят из изображений лиц добравольцев, готовых поучаствовать в проекте. Данные наборы имеют названия:
+Обучающая выборка состоит из 5 наборов изображений лиц. 4 из 5 наборов состоят из изображений лиц добровольцев, готовых поучаствовать в проекте. Данные наборы имеют названия:
 * `Men1`;
 * `Men2`;
 * `Men3`;
@@ -36,3 +36,19 @@ ___
 ### Пример сгенерированных изображений лиц:
 ![img](Documentation/some_person.png)
 ___
+
+## **Схема работы программы:**
+
+Программа поделена на 3 логические части:
+
+1. Поиск лиц на изображении;
+2. Создание двумерной лицевой маски;
+3. Определение человека исходя из двумерной лицевой маски.
+
+**Первая** и **Вторая** решаются путём использования двух предобученных свёрточных нейронных сетей модуля <a href="http://dlib.net/">Dlib</a>.<br>Модуль `dlib_face_recognition_resnet_model_v1` (<a href="https://github.com/ageitgey/face_recognition_models/blob/master/face_recognition_models/models/dlib_face_recognition_resnet_model_v1.dat">download</a>) ищет на изображении человеческие лица, после чего отделяет их от общей картинки.<br>Далее модуль `shape_predictor_68_face_landmarks` (<a href="https://github.com/tzutalin/dlib-android/blob/master/data/shape_predictor_68_face_landmarks.dat">download</a>), используя выделенное изображение, создаёт двумерную лицевую маску из множества точек. Эти точки преобразуются в одномерный массив (вектор) из чисел малых разрядов.
+
+После этого, набор чисел подаётся на вход нейронной сети **классификатору**. Модель делает предположение чьё лицо находится на изображении.
+
+![gif](Documentation/runtime%20animation.gif)
+
+> На данный момент выходной слой нейронной сети классификатора содержит 4 нейрона (на каждого отдельного добровольца). Чем выше значение на каждом нейроне, тем больше классификатор думает, что на изображении тот или иной доброволец. Порядок присвоения нейронов добровольцам следующий: 1. `Men1`; 2. `Men2`; 3. `Men3`; 4. `Female1`.<br>В дальнейшем, не исключается возможность полной переработки классификатора для масштабирования системы.
